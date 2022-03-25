@@ -14,9 +14,9 @@ class TelemetryDiagnosticControls
 
     private $telemetryClient;
 
-    public function __construct()
+    public function __construct(?TelemetryClientInterface $client = null)
     {
-        $this->telemetryClient = new TelemetryClient();
+        $this->telemetryClient = $client ?? new TelemetryClient();
     }
 
     /**
@@ -40,5 +40,10 @@ class TelemetryDiagnosticControls
 
         $this->telemetryClient->send(TelemetryClient::DIAGNOSTIC_MESSAGE);
         $this->diagnosticInfo = $this->telemetryClient->receive();
+    }
+
+    public function getClient(): TelemetryClientInterface
+    {
+        return $this->telemetryClient;
     }
 }

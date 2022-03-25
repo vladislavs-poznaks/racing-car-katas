@@ -7,7 +7,7 @@ namespace RacingCar\TelemetrySystem;
 use Exception;
 use InvalidArgumentException;
 
-class TelemetryClient
+class TelemetryClient implements TelemetryClientInterface
 {
     public const DIAGNOSTIC_MESSAGE = 'AT#UD';
 
@@ -95,7 +95,7 @@ Remote Rtrn Count........... 00";
         return $message;
     }
 
-    public function getOnlineStatus()
+    public function getOnlineStatus(): bool
     {
         return $this->onlineStatus;
     }
