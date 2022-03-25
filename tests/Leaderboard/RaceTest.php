@@ -4,35 +4,73 @@ declare(strict_types=1);
 
 namespace Tests\Leaderboard;
 
+use Faker\Factory;
+use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use RacingCar\Leaderboard\Driver;
 use RacingCar\Leaderboard\Race;
+use RacingCar\Leaderboard\SelfDrivingCar;
 
 class RaceTest extends TestCase
 {
-    private $driver1;
-
-    private $driver2;
-
-    private $driver3;
-
-    private $race1;
+    private Generator $faker;
 
     protected function setUp(): void
     {
+        $this->faker = Factory::create();
+
         parent::setUp();
-
-        $this->driver1 = new Driver('Nico Rosberg', 'DE');
-        $this->driver2 = new Driver('Lewis Hamilton', 'UK');
-        $this->driver3 = new Driver('Sebastian Vettel', 'DE');
-
-        $this->race1 = new Race('Australian Grand Prix', [$this->driver1, $this->driver2, $this->driver3]);
     }
 
-    public function testShouldCalculateDriverPoints(): void
+    private function getDriver(): Driver
     {
-        $this->assertSame(25, $this->race1->getPoints($this->driver1));
-        $this->assertSame(18, $this->race1->getPoints($this->driver2));
-        $this->assertSame(15, $this->race1->getPoints($this->driver3));
+        return new Driver($this->faker->name, $this->faker->countryCode());
+    }
+
+    private function getSelfDrivingCarDriver(): SelfDrivingCar
+    {
+        return new SelfDrivingCar($this->faker->semver(), $this->faker->company());
+    }
+
+    /** @test */
+    public function it_calculates_driver_points_with_real_drivers(): void
+    {
+        $race = new Race($this->faker->country() . ' - Grand Prix', [
+            $driverOne = $this->getDriver(),
+            $driverTwo = $this->getDriver(),
+            $driverThree = $this->getDriver(),
+        ]);
+
+        $this->assertSame(25, $race->getPoints($driverOne));
+        $this->assertSame(18, $race->getPoints($driverTwo));
+        $this->assertSame(15, $race->getPoints($driverThree));
+    }
+
+    /** @test */
+    public function it_calculates_driver_points_with_self_driving_cars(): void
+    {
+        $race = new Race($this->faker->country() . ' - Grand Prix', [
+            $driverOne = $this->getSelfDrivingCarDriver(),
+            $driverTwo = $this->getSelfDrivingCarDriver(),
+            $driverThree = $this->getSelfDrivingCarDriver(),
+        ]);
+
+        $this->assertSame(25, $race->getPoints($driverOne));
+        $this->assertSame(18, $race->getPoints($driverTwo));
+        $this->assertSame(15, $race->getPoints($driverThree));
+    }
+
+    /** @test */
+    public function it_calculates_driver_points_with_mixed_cars(): void
+    {
+        $race = new Race($this->faker->country() . ' - Grand Prix', [
+            $driverOne = $this->getDriver(),
+            $driverTwo = $this->getDriver(),
+            $driverThree = $this->getSelfDrivingCarDriver(),
+        ]);
+
+        $this->assertSame(25, $race->getPoints($driverOne));
+        $this->assertSame(18, $race->getPoints($driverTwo));
+        $this->assertSame(15, $race->getPoints($driverThree));
     }
 }
