@@ -12,7 +12,10 @@ class TicketDispenserTest extends TestCase
     /** @test */
     public function it_dispenses_ticket_with_one_dispenser(): void
     {
-        $dispenser = new TicketDispenser();
+        $turnSequence = new FakeTurnNumberSequence();
+        $turnSequence->resetTurns();
+
+        $dispenser = new TicketDispenser($turnSequence);
         $ticket = $dispenser->getTurnTicket();
         $this->assertSame(0, $ticket->getTurnNumber());
 
@@ -26,15 +29,18 @@ class TicketDispenserTest extends TestCase
     /** @test */
     public function it_dispenses_ticket_with_multiple_dispensers(): void
     {
-        $dispenser = new TicketDispenser();
+        $turnSequence = new FakeTurnNumberSequence();
+        $turnSequence->resetTurns();
+
+        $dispenser = new TicketDispenser($turnSequence);
         $ticket = $dispenser->getTurnTicket();
         $this->assertSame(0, $ticket->getTurnNumber());
 
-        $dispenser = new TicketDispenser();
+        $dispenser = new TicketDispenser($turnSequence);
         $ticket = $dispenser->getTurnTicket();
         $this->assertSame(1, $ticket->getTurnNumber());
 
-        $dispenser = new TicketDispenser();
+        $dispenser = new TicketDispenser($turnSequence);
         $ticket = $dispenser->getTurnTicket();
         $this->assertSame(2, $ticket->getTurnNumber());
     }
